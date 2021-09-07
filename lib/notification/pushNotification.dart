@@ -14,7 +14,7 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationplugin =
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print("Handling a background message : ${message.messageId}");
-  print("full massege on: ${message.data}");
+  //print("full massege on: ${message.data}");
 }
 
 class FirebaseNotifcation {

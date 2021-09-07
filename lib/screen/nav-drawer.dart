@@ -1,12 +1,27 @@
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:truck/model/jobPost.dart';
+import 'package:truck/network_utils/api.dart';
+import 'package:truck/screen/feedback.dart';
+import 'package:truck/screen/getdetail.dart';
 import 'package:truck/screen/home.dart';
 import 'package:truck/screen/jobpost.dart';
 import 'package:truck/screen/logout.dart';
+import 'package:truck/screen/map_screen.dart';
+import 'package:truck/screen/my-globals.dart';
+import 'package:truck/screen/payment.dart';
+import 'package:truck/screen/product/mainPage.dart';
+import 'package:truck/screen/product/product_detail.dart';
 import 'package:truck/screen/profile.dart';
 import 'package:truck/screen/rideBook.dart';
 import 'package:truck/screen/setting.dart';
-
+import 'package:truck/screen/startride.dart';
+import 'package:truck/screen/test.dart';
+import 'package:truck/screen/viewpost.dart';
+import 'package:truck/shop/screens/home/home.dart';
+import 'package:truck/shop/screens/user/login_page.dart';
 
 class NavDrawer extends StatefulWidget {
   @override
@@ -14,6 +29,30 @@ class NavDrawer extends StatefulWidget {
 }
 
 class _NavDrawerState extends State<NavDrawer> {
+  var user;
+  String image;
+  _loadUserData() async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    user = jsonDecode(localStorage.getString('user'));
+    //String userPref = localStorage.getString('user');
+//Map<String,dynamic> userMap = jsonDecode(userPref) as Map<String, dynamic>;
+    //print(user);
+    // dropdownValue=user['vehicle_type'];
+    //print(_dropDownValue);
+    setState(() {
+      if (user['image'] != null) {
+        image = Network().imageget + "/" + user['image'];
+        //print(image);
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -21,70 +60,100 @@ class _NavDrawerState extends State<NavDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Text(
-              '',
-              style: TextStyle(color: Colors.white, fontSize: 25),
+            child: CircleAvatar(
+              radius: 30.0,
+              backgroundImage: image == null
+                  ? AssetImage("assets/images/logo2.png")
+                  : NetworkImage(image),
+              backgroundColor: Colors.transparent,
             ),
-            decoration: BoxDecoration(
-                color: Colors.green,
-                image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('assets/images/logo.png'))
-                    ),
+
+            // decoration: BoxDecoration(
+            // color: globalColor,
+
+            // image:
+            // DecorationImage(
+            // fit: BoxFit.fill,
+            // image:
+            // image == null
+            // ? AssetImage("assets/images/logo2.png")
+            // : NetworkImage(image),
+            // )),
           ),
           ListTile(
             leading: Icon(Icons.input),
             title: Text('Dashboard'),
-            onTap: () => {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context)=>Home()))},
+            onTap: () => {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Home()))
+            },
           ),
-          
           ListTile(
             leading: Icon(Icons.input),
             title: Text('Ride-book'),
-            onTap: () => {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context)=>RideBook()))},
+            onTap: () => {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => RideBook()))
+            },
           ),
           ListTile(
             leading: Icon(Icons.input),
-            title: Text('Job Post'),
-            onTap: () => {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context)=>Jobpost()))},
+            title: Text('My Jobs'),
+            onTap: () => {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Jobpost()))
+            },
           ),
           ListTile(
             leading: Icon(Icons.verified_user),
             title: Text('Profile'),
-            onTap: () => {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context)=>Profile()))},
+            onTap: () => {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Profile()))
+            },
           ),
           ListTile(
             leading: Icon(Icons.settings),
             title: Text('Settings'),
-            onTap: () => {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context)=>Setting()))},
+            onTap: () => {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Payment()))
+            },
+          ),
+           ListTile(
+            leading: Icon(Icons.settings),
+            title: Text('homebar'),
+            onTap: () => {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProductDetailPage()))
+            },
           ),
           ListTile(
-            leading: Icon(Icons.border_color),
-            title: Text('Feedback'),
-            onTap: () => {Navigator.of(context).pop()},
+            leading: Icon(Icons.settings),
+            title: Text('ho'),
+            onTap: () => {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => MainPage()))
+            },
           ),
+          // ListTile(
+          // leading: Icon(Icons.border_color),
+          // title: Text('Feedback'),
+          // onTap: () => {
+          // Navigator.push(
+          // context, MaterialPageRoute(builder: (context) => ))
+          // },
+          // ),
           ListTile(
             leading: Icon(Icons.exit_to_app),
             title: Text('Logout'),
-            onTap: () => {Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context)=>Logout()))},
-            
+            onTap: () => {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Logout()))
+            },
           ),
         ],
       ),
     );
- 
-  
-   }
+  }
 }

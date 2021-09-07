@@ -1,24 +1,26 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:truck/model/loaction_model.dart';
+import 'package:truck/notification/pushNotification.dart';
 import 'package:truck/screen/login.dart';
 import 'package:truck/screen/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:truck/notification/message.dart';
-import 'package:truck/notification/message_list.dart';
-import 'package:truck/notification/permissions.dart';
-import 'package:truck/notification/token_monitor.dart';
+import 'package:truck/screen/maps/flutter_google_place_autocomplete.dart';
+import 'package:truck/screen/my-globals.dart';
+import 'package:truck/screen/product/product_detail.dart';
 import 'package:truck/screen/rideBook.dart';
+import 'package:truck/screen/my-globals.dart' as globals;
+import 'package:truck/service/location_service.dart';
 
-import 'dart:io';
-
-import 'notification/pushNotification.dart';
+import 'package:provider/provider.dart';
 
 //void main() => runApp(MyApp());
 //when app is terminate then work
@@ -26,7 +28,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
-  print('Handling a background message ${message.messageId}');
+  //print('Handling a background message ${message.messageId}');
+  globallist = [...globallist, message];
+
 }
 
 /// Create a [AndroidNotificationChannel] for heads up notifications
@@ -34,10 +38,10 @@ AndroidNotificationChannel channel;
 
 /// Initialize the [FlutterLocalNotificationsPlugin] package.
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   if (!kIsWeb) {
     channel = const AndroidNotificationChannel(
@@ -67,21 +71,31 @@ void main() async{
       sound: true,
     );
   }
-  
+  // return runApp(MultiProvider(
+  // providers: [
+  // ChangeNotifierProvider.value(
+  // value: AppState(),
+  // )
+  // ],
+  // child: MyApp(),
+  // ));
+
   runApp(MyApp());
 }
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Truck App',
-      debugShowCheckedModeBanner: false,
-      home: CheckAuth(),
-      routes: <String,WidgetBuilder>{
-        "/ridebook":(BuildContext context)=> new RideBook(),
-      }
-    );
+        title: 'Truck App',
+        debugShowCheckedModeBanner: true,
+        home: CheckAuth(),
+        routes: <String, WidgetBuilder>{
+          '/message': (context) => MessageView(),
+          "/ridebook": (BuildContext context) => new RideBook(),
+          "/detail": (BuildContext context) => new ProductDetailPage(),
+        });
   }
 }
 
@@ -91,15 +105,13 @@ class CheckAuth extends StatefulWidget {
 }
 
 class _CheckAuthState extends State<CheckAuth> {
-  static bool showToast = true;
-  
-      
-      //final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-      StreamSubscription iosSubscription;
-      // int _messageCount = 0;
-      // String _token;
+  FirebaseNotifcation firebase;
+  //final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
-/// The API endpoint here accepts a raw FCM payload for demonstration purposes.
+  // int _messageCount = 0;
+  // String _token;
+
+  /// The API endpoint here accepts a raw FCM payload for demonstration purposes.
 // String constructFCMPayload(String token) {
 //   _messageCount++;
 //   return jsonEncode({
@@ -114,33 +126,28 @@ class _CheckAuthState extends State<CheckAuth> {
 //     },
 //   });
 // }
- 
-
-    
-
 
   bool isAuth = false;
   @override
   void initState() {
     super.initState();
     _checkIfLoggedIn();
-    
-   
-     FirebaseMessaging.instance
+
+    FirebaseMessaging.instance
         .getInitialMessage()
-        .then((RemoteMessage message) { 
-          //print("how too $message");
+        .then((RemoteMessage message) {
+      //print("how too $message");
       if (message != null) {
-        Navigator.pushNamed(context, message.data['screen'],
-          arguments: MessageArguments(message, true));
         Navigator.pushNamed(context, '/message',
             arguments: MessageArguments(message, true));
-
+        // Navigator.pushNamed(context, "/" + message.data['screen'],
+        // arguments: MessageArguments(message, true));
       }
     });
-///forgroung work
+
+    ///forgroung work
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      //print('A new  $message');
+      //print('onMessageOpenedApp data: ${message.data}');
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
       if (notification != null && android != null && !kIsWeb) {
@@ -153,85 +160,87 @@ class _CheckAuthState extends State<CheckAuth> {
                 channel.id,
                 channel.name,
                 channel.description,
-                // TODO add a proper drawable resource to android, for now using
-                //      one that already exists in example app.
                 icon: 'launch_background',
               ),
             ));
       }
+      globallist = [...globallist, message];
+      Navigator.pushNamed(context, "/" + message.data['screen'],
+          arguments: MessageArguments(message, true));
     });
-//when app is in background but opend and user taps 
+//when app is in background but opend and user taps
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       //print('A new onMessageOpenedApp event was published! $message');
-      Navigator.pushNamed(context, message.data['screen'],
-          arguments: MessageArguments(message, true));
+
       Navigator.pushNamed(context, '/message',
           arguments: MessageArguments(message, true));
     });
     firebase = FirebaseNotifcation();
-     handleAsync();
+    handleAsync();
   }
+
   //notification
-FirebaseNotifcation firebase;
+  //FirebaseNotifcation firebase;
 
   handleAsync() async {
     await firebase.initialize();
 
-    String token = await firebase.getToken();
+    //String token = await firebase.getToken();
     //print("Firebase token : $token");
   }
 
+  Future<void> onActionSelected(String value) async {
+    switch (value) {
+      case 'subscribe':
+        {
+          print(
+              'FlutterFire Messaging Example: Subscribing to topic "fcm_test".');
+          await FirebaseMessaging.instance.subscribeToTopic('fcm_test');
+          print(
+              'FlutterFire Messaging Example: Subscribing to topic "fcm_test" successful.');
+        }
+        break;
+      case 'unsubscribe':
+        {
+          print(
+              'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test".');
+          await FirebaseMessaging.instance.unsubscribeFromTopic('fcm_test');
+          print(
+              'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test" successful.');
+        }
+        break;
+      case 'get_apns_token':
+        {
+          if (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS) {
+            print('FlutterFire Messaging Example: Getting APNs token...');
+            String token = await FirebaseMessaging.instance.getAPNSToken();
+            print('FlutterFire Messaging Example: Got APNs token: $token');
+          } else {
+            print(
+                'FlutterFire Messaging Example: Getting an APNs token is only supported on iOS and macOS platforms.');
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  }
 
-  // Future<void> onActionSelected(String value) async {
-  //   switch (value) {
-  //     case 'subscribe':
-  //       {
-  //         print(
-  //             'FlutterFire Messaging Example: Subscribing to topic "fcm_test".');
-  //         await FirebaseMessaging.instance.subscribeToTopic('fcm_test');
-  //         print(
-  //             'FlutterFire Messaging Example: Subscribing to topic "fcm_test" successful.');
-  //       }
-  //       break;
-  //     case 'unsubscribe':
-  //       {
-  //         print(
-  //             'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test".');
-  //         await FirebaseMessaging.instance.unsubscribeFromTopic('fcm_test');
-  //         print(
-  //             'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test" successful.');
-  //       }
-  //       break;
-  //     case 'get_apns_token':
-  //       {
-  //         if (defaultTargetPlatform == TargetPlatform.iOS ||
-  //             defaultTargetPlatform == TargetPlatform.macOS) {
-  //           print('FlutterFire Messaging Example: Getting APNs token...');
-  //           String token = await FirebaseMessaging.instance.getAPNSToken();
-  //           print('FlutterFire Messaging Example: Got APNs token: $token');
-  //         } else {
-  //           print(
-  //               'FlutterFire Messaging Example: Getting an APNs token is only supported on iOS and macOS platforms.');
-  //         }
-  //       }
-  //       break;
-  //     default:
-  //       break;
-  //   }
-    
-    
-  // }
-
-  void _checkIfLoggedIn() async{
+  void _checkIfLoggedIn() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
-    if(token != null){
+    //print('first token : $token');
+    if (token != null) {
+      var user = jsonDecode(localStorage.getString('user'));
       setState(() {
         isAuth = true;
+        globals.globalString = user['role'];
+        globals.globalInt = user['id'];
       });
     }
   }
-  
+
   // @override
   // Widget build(BuildContext context) {
   //   return Scaffold(
@@ -259,7 +268,7 @@ FirebaseNotifcation firebase;
   //         ),
   //       ],
   //     ),
-      
+
   //     body: SingleChildScrollView(
   //       child: Column(children: [
   //         MetaCard('Permissions', Permissions()),
@@ -276,38 +285,34 @@ FirebaseNotifcation firebase;
   // }
   @override
   Widget build(BuildContext context) {
-    Widget child;
-    if (isAuth) {
-      child = Home();
-    } else {
-      child = Login();
-    }
-    return Scaffold(
-      body: child,
+    return Center(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.light(),
+        home: isAuth ? Home() : Login(),
+      ),
     );
   }
 }
-class MetaCard extends StatelessWidget {
-  final String _title;
-  final Widget _children;
 
-  // ignore: public_member_api_docs
-  MetaCard(this._title, this._children);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(left: 8, right: 8, top: 8),
-        child: Card(
-            child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(children: [
-                  Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child:
-                          Text(_title, style: const TextStyle(fontSize: 18))),
-                  _children,
-                ]))));
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
