@@ -23,11 +23,13 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    InkWell(
       onTap: () {
         print(widget.product.id);
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ProductDetailPage()));
+            MaterialPageRoute(
+                builder: (context) =>
+                    ItemDetailPage(itemId: widget.product.id)));
         setState(() {
           model.isSelected = !model.isSelected;
           AppData.productList.forEach((x) {
@@ -91,7 +93,7 @@ class _ProductCardState extends State<ProductCard> {
                   fontSize: model.isSelected ? 16 : 14,
                 ),
                 TitleText(
-                  text: model.category,
+                  text: model.name,
                   fontSize: model.isSelected ? 14 : 12,
                   color: LightColor.orange,
                 ),

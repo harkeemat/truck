@@ -120,22 +120,15 @@ class _NavDrawerState extends State<NavDrawer> {
                   context, MaterialPageRoute(builder: (context) => Payment()))
             },
           ),
-           ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('homebar'),
-            onTap: () => {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProductDetailPage()))
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('ho'),
-            onTap: () => {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => MainPage()))
-            },
-          ),
+          //  ListTile(
+          //   leading: Icon(Icons.settings),
+          //   title: Text('homebar'),
+          //   onTap: () => {
+          //     Navigator.push(context,
+          //         MaterialPageRoute(builder: (context) => ProductDetailPage()))
+          //   },
+          // ),
+       
           // ListTile(
           // leading: Icon(Icons.border_color),
           // title: Text('Feedback'),

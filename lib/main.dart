@@ -89,12 +89,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Truck App',
-        debugShowCheckedModeBanner: true,
+        debugShowCheckedModeBanner: false,
         home: CheckAuth(),
         routes: <String, WidgetBuilder>{
           '/message': (context) => MessageView(),
           "/ridebook": (BuildContext context) => new RideBook(),
-          "/detail": (BuildContext context) => new ProductDetailPage(),
+          
         });
   }
 }

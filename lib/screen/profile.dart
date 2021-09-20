@@ -79,7 +79,7 @@ class _ProfileState extends State<Profile> {
     var res = await Network().getData('/getvehicle');
     final jsonresponse = json.decode(res.body);
 
-    print(jsonresponse['vehicle']);
+    //print(jsonresponse['vehicle']);
     this.setState(() {
       alertdata = jsonresponse['vehicle'];
     });

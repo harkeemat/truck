@@ -227,7 +227,7 @@ class _HomeState extends State<Home> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            name,
+                            name != null ? name : "",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,

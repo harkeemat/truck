@@ -1,151 +1,190 @@
 import 'package:flutter/material.dart';
-import 'package:truck/model/data.dart';
-import 'package:truck/model/product.dart';
-import 'package:truck/theme/light_color.dart';
-import 'package:truck/theme/theme.dart';
-import 'package:truck/widget/title_text.dart';
+import 'package:get/get.dart';
+import 'package:truck/controller/homePageController.dart';
+import 'package:truck/model/ItemModel.dart';
+import 'package:truck/screen/my-globals.dart';
 
-class ShopingCartPage extends StatelessWidget {
-  const ShopingCartPage({Key key}) : super(key: key);
-
-  Widget _cartItems() {
-    return Column(children: AppData.cartList.map((x) => _item(x)).toList());
-  }
-
-  Widget _item(Product model) {
-    return Container(
-      height: 80,
-      child: Row(
-        children: <Widget>[
-          AspectRatio(
-            aspectRatio: 1.2,
-            child: Stack(
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Container(
-                    height: 70,
-                    width: 70,
-                    child: Stack(
-                      children: <Widget>[
-                        Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: LightColor.lightGrey,
-                                borderRadius: BorderRadius.circular(10)),
+class CartPage extends StatelessWidget {
+  
+  Widget generateCart(BuildContext context, ShopItemModel d) {
+   // print(d.quntity);
+    return Padding(
+      padding: EdgeInsets.all(5.0),
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.white12,
+            border: Border(
+              bottom: BorderSide(color: Colors.grey.shade100, width: 1.0),
+              top: BorderSide(color: Colors.grey.shade100, width: 1.0),
+            )),
+        height: 100.0,
+        child: Row(
+          children: <Widget>[
+            Container(
+              alignment: Alignment.topLeft,
+              height: 100.0,
+              width: 100.0,
+              decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(color: Colors.black12, blurRadius: 5.0)
+                  ],
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(10.0),
+                      bottomRight: Radius.circular(10.0)),
+                  image: DecorationImage(
+                      image: NetworkImage(d.image), fit: BoxFit.fitHeight)),
+            ),
+            Expanded(
+                child: Padding(
+              padding: EdgeInsets.only(top: 10.0, left: 15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          d.name,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 15.0),
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.bottomRight,
+                        child: InkResponse(
+                          onTap: () {
+                            Get.find<HomePageController>()
+                                .removeFromCart(d.shopId ?? 0);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    "Item removed from cart successfully")));
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 10.0),
+                            child: Icon(
+                              Icons.remove_circle,
+                              color: Colors.red,
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: -20,
-                  bottom: -20,
-                  child: Image.asset(model.image),
-                )
-              ],
-            ),
-          ),
-          Expanded(
-              child: ListTile(
-                  title: TitleText(
-                    text: model.name,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  subtitle: Row(
-                    children: <Widget>[
-                      TitleText(
-                        text: '\$ ',
-                        color: LightColor.red,
-                        fontSize: 12,
                       ),
-                      TitleText(
-                        text: model.price.toString(),
-                        fontSize: 14,
-                      ),
+                      // Container(
+                      //   alignment: Alignment.bottomRight,
+                      //   child: InkResponse(
+                      //     onTap: () {
+                      //       print(d.quntity);
+                      //       int value = (d.quntity) + 1;
+                      //       Get.find<HomePageController>()
+                      //           .addToQuntity(d.shopId ?? 0, value);
+                      //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      //           content:
+                      //               Text("Item add from cart successfully")));
+                      //     },
+                      //     child: Padding(
+                      //       padding: EdgeInsets.only(right: 10.0),
+                      //       child: Icon(
+                      //         Icons.add_circle,
+                      //         color: Colors.red,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // )
                     ],
                   ),
-                  trailing: Container(
-                    width: 35,
-                    height: 35,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        color: LightColor.lightGrey.withAlpha(150),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: TitleText(
-                      text: 'x${model.id}',
-                      fontSize: 12,
-                    ),
-                  )))
-        ],
+                  SizedBox(
+                    height: 5.0,
+                  ),
+                  Text("Price ${d.price.toString()}"),
+                ],
+              ),
+            ))
+          ],
+        ),
       ),
     );
   }
 
-  Widget _price() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        TitleText(
-          text: '${AppData.cartList.length} Items',
-          color: LightColor.grey,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-        TitleText(
-          text: '\$${getPrice()}',
-          fontSize: 18,
-        ),
-      ],
-    );
-  }
-
-  Widget _submitButton(BuildContext context) {
-    return FlatButton(
-        onPressed: () {
-          print(context);
-        },
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        color: LightColor.orange,
-        child: Container(
-          alignment: Alignment.center,
-          padding: EdgeInsets.symmetric(vertical: 12),
-          width: AppTheme.fullWidth(context) * .7,
-          child: TitleText(
-            text: 'Next',
-            color: LightColor.background,
-            fontWeight: FontWeight.w500,
-          ),
-        ));
-  }
-
-  double getPrice() {
-    double price = 0;
-    AppData.cartList.forEach((x) {
-      price += x.price * x.id;
+  getItemTotal(List<ShopItemModel> items) {
+    double sum = 0.0;
+    items.forEach((e) {
+      sum += e.price;
     });
-    return price;
+    return "\$$sum";
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: AppTheme.padding,
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            _cartItems(),
-            Divider(
-              thickness: 1,
-              height: 70,
+    final controller = Get.find<HomePageController>();
+
+    // TODO: implement build
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Cart list"),
+        backgroundColor: globalColor,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: GetBuilder<HomePageController>(
+                builder: (_) {
+                  if (controller.cartItems.length == 0) {
+                    return Center(
+                      child: Text("No item found"),
+                    );
+                  }
+                  return ListView(
+                    shrinkWrap: true,
+                    children: controller.cartItems
+                        .map((d) => generateCart(context, d))
+                        .toList(),
+                  );
+                },
+              ),
             ),
-            _price(),
-            SizedBox(height: 30),
-            _submitButton(context),
-          ],
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        color: Colors.white,
+        child: SafeArea(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(child: GetBuilder<HomePageController>(
+                builder: (_) {
+                  return RichText(
+                    text: TextSpan(
+                        text: "Total  ",
+                        style: TextStyle(color: Colors.black, fontSize: 18),
+                        children: <TextSpan>[
+                          TextSpan(
+                              text:
+                                  getItemTotal(controller.cartItems).toString(),
+                              style: TextStyle(fontWeight: FontWeight.bold))
+                        ]),
+                  );
+                },
+              )),
+              Container(
+                alignment: Alignment.centerLeft,
+                height: 50,
+                color: Colors.white,
+                child: ElevatedButton(
+                    onPressed: () {},
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 40,
+                      width: 100,
+                      child: Text(
+                        "Checkout",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    )),
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -75,7 +75,7 @@ class _SettingPageState extends State<Setting> {
         });
       }
 
-      print(documentSnapshot.id);
+      //print(documentSnapshot.id);
     } catch (e) {
       print(e);
     }

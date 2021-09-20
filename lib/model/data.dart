@@ -64,13 +64,13 @@ class AppData {
         isliked: false,
         image: 'assets/small_tilt_shoe_1.png',
         category: "Trending Now"),
-    // Product(
-    //     id:1,
-    //     name: 'Nike Air Max 97',
-    //     price: 190.00,
-    //     isliked: false,
-    //     image: 'assets/small_tilt_shoe_2.png',
-    //     category: "Trending Now"),
+    Product(
+        id: 1,
+        name: 'Nike Air Max 97',
+        price: 190.00,
+        isliked: false,
+        image: 'assets/small_tilt_shoe_2.png',
+        category: "Trending Now"),
   ];
   static List<Category> categoryList = [
     Category(),

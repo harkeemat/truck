@@ -4,7 +4,13 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 int globalInt = 0;
+int globalbrandid = 1;
 bool globalBoolean = true;
+bool globalisbrand = false;
+bool globaliscategory = false;
+bool globalisproduct = false;
+String globalbranname = "";
+String globalsearchword = "";
 String globalString = "";
 String globalRole = "";
 double globalDouble = 10.0;

@@ -70,6 +70,8 @@ dependencies:
   transparent_image: ^2.0.0
   carousel_pro: ^1.0.0
   connectivity_plus: ^1.0.6
+  sqflite: ^2.0.0+4
+  get: ^4.3.8
 
 
   
@@ -132,13 +134,13 @@ flutter:
   fonts:
   - family: OpenSans
     fonts:
-      - asset: fonts/OpenSans-Regular.ttf
-      - asset: fonts/OpenSans-Bold.ttf
+      - asset:  fonts/OpenSans-Regular.ttf
+      - asset:  fonts/OpenSans-Bold.ttf
       - weight: 700
   - family: Roboto
     fonts:
-      - asset: fonts/Roboto-Regular.ttf
-      - asset: fonts/Roboto-Bold.ttf
+      - asset:  fonts/Roboto-Regular.ttf
+      - asset:  fonts/Roboto-Bold.ttf
       - weight: 700
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

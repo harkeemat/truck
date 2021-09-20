@@ -1,21 +1,44 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:truck/screen/product/home_page.dart';
+import 'package:get/get.dart';
+import 'package:truck/controller/homePageController.dart';
+import 'package:truck/network_utils/api.dart';
+import 'package:truck/screen/my-globals.dart';
+
+import 'package:truck/screen/product/product.dart';
 import 'package:truck/screen/product/shoping_cart_page.dart';
+
 import 'package:truck/theme/light_color.dart';
 import 'package:truck/theme/theme.dart';
-import 'package:truck/widget/bootom_navigation_bar.dart';
+
 import 'package:truck/widget/title_text.dart';
 
-class MainPage extends StatefulWidget {
-  MainPage({Key key, this.title}) : super(key: key);
+class Brand extends StatefulWidget {
+  Brand({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MainPageState createState() => _MainPageState();
+  _BrandState createState() => _BrandState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _BrandState extends State<Brand> {
+  List brandmodel;
+
+  final HomePageController controller = Get.put(HomePageController());
+  brandcat() async {
+    var res = await Network().getData('/getbrand/');
+
+    final jsonresponse = json.decode(res.body);
+    //print(jsonresponse['data']);
+    setState(() {
+      brandmodel = jsonresponse['data'];
+    });
+
+    //final List<Item> foodCategoryList = jsonresponse['data'];
+  }
+
   bool isHomePageSelected = true;
   Widget _appBar() {
     return Container(
@@ -71,12 +94,12 @@ class _MainPageState extends State<MainPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 TitleText(
-                  text: isHomePageSelected ? 'Our' : 'Shopping',
+                  text: isHomePageSelected ? 'All' : 'Shopping',
                   fontSize: 27,
                   fontWeight: FontWeight.w400,
                 ),
                 TitleText(
-                  text: isHomePageSelected ? 'Products' : 'Cart',
+                  text: isHomePageSelected ? 'Brand' : 'Cart',
                   fontSize: 27,
                   fontWeight: FontWeight.w700,
                 ),
@@ -106,8 +129,44 @@ class _MainPageState extends State<MainPage> {
   }
 
   @override
+  void initState() {
+    brandcat();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Shops"),
+        elevation: 0.0,
+        backgroundColor: globalColor,
+        actions: <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: InkResponse(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => CartPage()));
+                },
+                child: Stack(
+                  children: [
+                    GetBuilder<HomePageController>(
+                        builder: (_) => Align(
+                              child: Text(controller.cartItems.length > 0
+                                  ? controller.cartItems.length.toString()
+                                  : ''),
+                              alignment: Alignment.topLeft,
+                            )),
+                    Align(
+                      child: Icon(Icons.shopping_cart),
+                      alignment: Alignment.center,
+                    ),
+                  ],
+                )),
+          )
+        ],
+      ),
       body: SafeArea(
         child: Stack(
           fit: StackFit.expand,
@@ -127,19 +186,27 @@ class _MainPageState extends State<MainPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    _appBar(),
-                    _title(),
                     Expanded(
                         child: AnimatedSwitcher(
-                            duration: Duration(milliseconds: 300),
-                            switchInCurve: Curves.easeInToLinear,
-                            switchOutCurve: Curves.easeOutBack,
-                            child: isHomePageSelected
-                                ? MyHomePage()
-                                : Align(
-                                    alignment: Alignment.topCenter,
-                                    child: CartPage(),
-                                  )))
+                      duration: Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeInToLinear,
+                      switchOutCurve: Curves.easeOutBack,
+                      child: brandmodel != null
+                          ? GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 4 / 5,
+                                      mainAxisSpacing: 15,
+                                      crossAxisSpacing: 20),
+                              itemCount:
+                                  brandmodel == null ? 0 : brandmodel.length,
+                              itemBuilder: (BuildContext ctx, index) {
+                                final brand = brandmodel[index];
+                                return branddata(brand);
+                              })
+                          : Center(child: CircularProgressIndicator()),
+                    ))
                   ],
                 ),
               ),
@@ -151,6 +218,26 @@ class _MainPageState extends State<MainPage> {
             //       onIconPresedCallback: onBottomIconPressed,
             //     ))
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget branddata(brand) {
+    return InkWell(
+      onTap: () {
+        globalbrandid = brand['id'];
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Product(brandid: brand['id'])));
+      },
+      child: Card(
+        color: Colors.white,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: Image.network(Network().imageget + "/" + brand['logo'],
+              fit: BoxFit.fill),
         ),
       ),
     );
