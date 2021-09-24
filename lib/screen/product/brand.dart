@@ -173,7 +173,7 @@ class _BrandState extends State<Brand> {
           children: <Widget>[
             SingleChildScrollView(
               child: Container(
-                height: AppTheme.fullHeight(context) - 50,
+                height: AppTheme.fullHeight(context) - 100,
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
                   colors: [
@@ -196,14 +196,14 @@ class _BrandState extends State<Brand> {
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
-                                      childAspectRatio: 4 / 5,
-                                      mainAxisSpacing: 15,
-                                      crossAxisSpacing: 20),
+                                      childAspectRatio: 10.7 / 11,
+                                      mainAxisSpacing: 20,
+                                      crossAxisSpacing: 10),
                               itemCount:
                                   brandmodel == null ? 0 : brandmodel.length,
                               itemBuilder: (BuildContext ctx, index) {
                                 final brand = brandmodel[index];
-                                return branddata(brand);
+                                return brands(brand);
                               })
                           : Center(child: CircularProgressIndicator()),
                     ))
@@ -222,7 +222,78 @@ class _BrandState extends State<Brand> {
       ),
     );
   }
-
+Widget brands(item) {
+    //print("dfdf${item['logo']}");
+    return SizedBox(
+        child: InkWell(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Product(brandname: {
+                            "brandname": null,
+                            "searchby": null,
+                            "id": item['id']
+                          })));
+            },
+            child: Card(
+              elevation: 2,
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                      
+                      margin: EdgeInsets.all(6.0),
+                      child: Image.network(
+                          Network().imageget + "/" + item['logo'],
+                          fit: BoxFit.cover)),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: Text(
+                            "${item['name']}",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: "OpenSans",
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          child: Text(
+                            "${item['slug']}",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontFamily: "OpenSans",
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          child: Text(
+                            "${item['address']}",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontFamily: "OpenSans",
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            )));
+  }
   Widget branddata(brand) {
     return InkWell(
       onTap: () {
@@ -230,7 +301,11 @@ class _BrandState extends State<Brand> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => Product(brandid: brand['id'])));
+                builder: (context) => Product(brandname: {
+                      "brandname": null,
+                      "searchby": null,
+                      "id": brand['id']
+                    })));
       },
       child: Card(
         color: Colors.white,

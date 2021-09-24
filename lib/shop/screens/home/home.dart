@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,18 +8,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:truck/network_utils/api.dart';
 import 'package:truck/screen/my-globals.dart';
 import 'package:truck/screen/product/brand.dart';
-import 'package:truck/screen/product/mainPage.dart';
 import 'package:truck/screen/product/product.dart';
-import 'package:truck/shop/models/foodCategroyModel.dart';
 import 'package:truck/shop/models/nearby_restaurant_model.dart';
 import 'package:truck/shop/models/top_pick_for_model.dart';
-import 'package:truck/shop/screens/home/food_category.dart';
-import 'package:truck/shop/screens/home/homeDetail.dart';
 import 'package:truck/shop/screens/home/nearby_restaurant.dart';
 import 'package:truck/shop/screens/home/top_picks.dart';
-import 'package:truck/shop/screens/myAccount/profile.dart';
 import 'package:truck/shop/utlis/platte.dart';
-import 'package:truck/shop/widgets/bottom_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -52,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     print(value);
   }
 
+  bool isliked = false;
   String dropdownvalue = 'Brand';
   var items = [
     'Brand',
@@ -195,159 +191,225 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Row(
-                //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: DropdownButton(
-                          value: dropdownvalue,
-                          elevation: 16,
-                          icon: Icon(Icons.keyboard_arrow_down),
-                          items: items.map((String items) {
-                            return DropdownMenuItem(
-                                value: items, child: Text(items));
-                          }).toList(),
-                          onChanged: (String newValue) {
-                            setState(() {
-                              globalbranname = newValue;
-                              if (newValue == "Brand") {
-                                globalisbrand = true;
-                                globaliscategory = false;
-                                globalisproduct = false;
-                              }
-                              if (newValue == "Category") {
-                                globalisbrand = false;
-                                globaliscategory = true;
-                                globalisproduct = false;
-                              }
-                              if (newValue == "Product") {
-                                globalisbrand = false;
-                                globaliscategory = false;
-                                globalisproduct = true;
-                              }
-
-                              globalsearchword = "";
-                              dropdownvalue = newValue;
-                            });
-                          },
-                          underline: SizedBox(),
-                          hint: Text("filter")),
+                  Container(
+                    width: 99,
+                    child: Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: DropdownButton(
+                            value: dropdownvalue,
+                            elevation: 16,
+                            icon: Icon(Icons.keyboard_arrow_down),
+                            items: items.map((String items) {
+                              return DropdownMenuItem(
+                                  value: items, child: Text(items));
+                            }).toList(),
+                            onChanged: (String newValue) {
+                              setState(() {
+                                dropdownvalue = newValue;
+                              });
+                            },
+                            underline: SizedBox(),
+                            hint: Text("filter")),
+                      ),
                     ),
                   ),
                   Expanded(
                     flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
+                    
                       child: TextField(
                         controller: _textController,
                         decoration: InputDecoration(
-                          border: InputBorder.none,
-                          prefixIcon: Icon(Icons.search),
+                         // border: InputBorder.,
+                          
                           hintText: 'Search ',
                           contentPadding:
                               EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         ),
                         //onChanged: onItemChanged,
                       ),
-                    ),
+                    
                   ),
                   Expanded(
-                      child: TextButton(
-                    style: TextButton.styleFrom(
-                        primary: Colors.white60, backgroundColor: globalbutton),
-                    onPressed: () {
-                      print(globaliscategory);
-                      print(_textController.text);
-                    },
-                    child: Text('Search'),
-                  )),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: globalbutton,
+                        shape: CircleBorder(),
+                      ),
+                      child: Icon(
+                        Icons.search,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                         Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Product(brandname: {
+                                      "brandname": dropdownvalue,
+                                      "searchby": _textController.text,
+                                      "id": null
+                                    })));
+                      },
+                    ),
+                  ),
                 ],
               ),
-
-              Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListView.builder(
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount:
-                          categorymodel == null ? 0 : categorymodel.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Column(
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 4.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    child: Text(
-                                      categorymodel[index]['name'],
-                                      style: ksmallBoldBlackText,
-                                    ),
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => Brand()));
-                                      // setState() {
-
-                                      // }
-                                    },
-                                    child: Text(
-                                      "See all",
-                                      style: ksmallBoldBlackText,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            pruductImage(),
-                          ],
-                        );
-                      })
-                  //: Center(child: CircularProgressIndicator()),
-
-                  ),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment
+                      .center, //Center Row contents horizontally,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Spacer(),
+                    
+                    Spacer(),
+                  ]),
+              // isliked == true
+              //     ? Allproduct(brandname: {
+              //         "brandname": dropdownvalue,
+              //         "searchby": _textController.text,
+              //         "id": null
+              //       })
               Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 4.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          child: Text("Top Picks For You",
-                              style: ksmallBoldBlackText),
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListView.builder(
+                          physics: ClampingScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount:
+                              categorymodel == null ? 0 : categorymodel.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Column(
+                              children: [
+                                
+                                Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                      8.0, 8.0, 8.0, 4.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        child: Text(
+                                          categorymodel[index]['name'],
+                                          style: ksmallBoldBlackText,
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+
+                                                Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                        builder: (context) =>
+                                                      Brand()));
+                                          // setState() {
+
+                                                // }
+                                        },
+                                        child: Text(
+                                          "See all",
+                                          style: ksmallBoldBlackText,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    height: 150,
+                                    child: (brandmodel.isNotEmpty)
+                                        ? ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: brandmodel.length,
+                                            itemBuilder: (BuildContext context,
+                                                    int index) =>
+                                                //print(brandmodel[index]);
+                                                brands(brandmodel[index]))
+                                        : CircularProgressIndicator(),
+                                  ),
+                                ),
+                              ],
+                            );
+                          })
+                      //: Center(child: CircularProgressIndicator()),
+
+                      ),
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 4.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              child: Text("Top Picks For You",
+                                  style: ksmallBoldBlackText),
+                            ),
+                            Container(
+                              child: Text(
+                                "See all",
+                                style: ksmallBoldBlackText,
+                                textScaleFactor: 1,
+                              ),
+                            ),
+                          ],
                         ),
-                        Container(
-                          child: Text(
-                            "See all",
-                            style: ksmallBoldBlackText,
-                            textScaleFactor: 1,
-                          ),
+                      ),
+                      Container(
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 150,
+                          child: (TopPickForsModel.topPicks.isNotEmpty)
+                              ? ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: TopPickForsModel.topPicks.length,
+                                  itemBuilder: (BuildContext context,
+                                          int index) =>
+                                      TopPickFood(
+                                          item:
+                                              TopPickForsModel.topPicks[index]))
+                              : CircularProgressIndicator(),
                         ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 150,
-                      child: (TopPickForsModel.topPicks.isNotEmpty)
-                          ? ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: TopPickForsModel.topPicks.length,
-                              itemBuilder: (BuildContext context, int index) =>
-                                  TopPickFood(
-                                      item: TopPickForsModel.topPicks[index]))
-                          : CircularProgressIndicator(),
-                    ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 4.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                                child: Text("Near By Restaurant",
+                                    style: ksmallBoldBlackText)),
+                            Container(
+                              child: Text(
+                                "See all",
+                                style: ksmallBoldBlackText,
+                                textScaleFactor: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                          child: SizedBox(
+                        width: double.infinity,
+                        height: 100,
+                        child: (NearByReasturantModel.reasturants.isNotEmpty)
+                            ? ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount:
+                                    NearByReasturantModel.reasturants.length,
+                                itemBuilder:
+                                    (BuildContext context, int index) =>
+                                        NearByReataurant(
+                                            item: NearByReasturantModel
+                                                .reasturants[index]))
+                            : CircularProgressIndicator(),
+                      )),
+                    ],
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 4.0),
@@ -355,8 +417,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                            child: Text("Near By Restaurant",
-                                style: ksmallBoldBlackText)),
+                          child: Text(
+                            "Meal Deals",
+                            style: ksmallBoldBlackText,
+                            textScaleFactor: 1,
+                          ),
+                        ),
                         Container(
                           child: Text(
                             "See all",
@@ -367,253 +433,87 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  Container(
-                      child: SizedBox(
-                    width: double.infinity,
-                    height: 100,
-                    child: (NearByReasturantModel.reasturants.isNotEmpty)
-                        ? ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: NearByReasturantModel.reasturants.length,
-                            itemBuilder: (BuildContext context, int index) =>
-                                NearByReataurant(
-                                    item: NearByReasturantModel
-                                        .reasturants[index]))
-                        : CircularProgressIndicator(),
-                  )),
                 ],
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      child: Text(
-                        "Meal Deals",
-                        style: ksmallBoldBlackText,
-                        textScaleFactor: 1,
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        "See all",
-                        style: ksmallBoldBlackText,
-                        textScaleFactor: 1,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Container(
-              //   child: SizedBox(
-              //     width: double.infinity,
-              //     height: 100,
-              //     child: (FoodCategoryModel.isNotEmpty)
-              //         ? ListView.builder(
-              //             scrollDirection: Axis.horizontal,
-              //             itemCount: FoodCategoryModel.length,
-              //             itemBuilder: (BuildContext context, int index) =>
-              //                 FoodCategory(
-              //                     item: FoodCategoryModel[index]))
-              //         : CircularProgressIndicator(),
-              //   ),
-              // ),
+              )
             ],
           ),
         ],
       ),
-      //     drawer: Drawer(
-      //       child: ListView(
-      //         children: [
-      //           DrawerHeader(
-      //             decoration: BoxDecoration(color: Colors.red[500]),
-      //             child: Column(
-      //               children: [
-      //                 CircleAvatar(
-      //                   radius: 50,
-      //                   backgroundColor: Colors.black12,
-      //                   backgroundImage: AssetImage("assets/images/profile.jpeg"),
-      //                   child: Padding(
-      //                     padding: const EdgeInsets.only(top: 50, left: 50),
-      //                     child: SizedBox(
-      //                       height: 20,
-      //                       width: 20,
-      //                       child: Container(
-      //                           height: 80,
-      //                           child: IconButton(
-      //                             icon: Icon(
-      //                               CupertinoIcons.camera_circle_fill,
-      //                               color: Colors.white,
-      //                             ),
-      //                             onPressed: () {},
-      //                           )),
-      //                     ),
-      //                   ),
-      //                 ),
-      //                 Container(
-      //                   margin: EdgeInsets.only(top: 16),
-      //                   child: Text(
-      //                     "Gaurav",
-      //                     style: ksmallText,
-      //                   ),
-      //                 )
-      //               ],
-      //             ),
-      //           ),
-      //           ListTile(
-      //               leading: Icon(
-      //                 CupertinoIcons.bag_fill,
-      //                 color: Colors.black,
-      //               ),
-      //               title: Text(
-      //                 "Orders",
-      //                 style: kNavigationText,
-      //               ),
-      //               selected: true,
-      //               onTap: () => Navigator.push(
-      //                     context,
-      //                     MaterialPageRoute(
-      //                       builder: (context) => BottomNavBar(),
-      //                     ),
-      //                   )),
-      //           ListTile(
-      //               leading: Icon(
-      //                 CupertinoIcons.suit_heart_fill,
-      //                 color: Colors.black,
-      //               ),
-      //               title: Text(
-      //                 "Favorites",
-      //                 style: kNavigationText,
-      //               ),
-      //               selected: true,
-      //               onTap: () => Navigator.push(
-      //                     context,
-      //                     MaterialPageRoute(
-      //                       builder: (context) => BottomNavBar(),
-      //                     ),
-      //                   )),
-      //           ListTile(
-      //               leading: Icon(
-      //                 CupertinoIcons.cart_fill_badge_plus,
-      //                 color: Colors.black,
-      //               ),
-      //               title: Text(
-      //                 "Cart",
-      //                 style: kNavigationText,
-      //               ),
-      //               selected: true,
-      //               onTap: () => Navigator.push(
-      //                     context,
-      //                     MaterialPageRoute(
-      //                       builder: (context) => BottomNavBar(),
-      //                     ),
-      //                   )),
-      //           ListTile(
-      //               leading: Icon(
-      //                 Icons.local_offer_rounded,
-      //                 color: Colors.black,
-      //               ),
-      //               title: Text(
-      //                 "Discounts",
-      //                 style: kNavigationText,
-      //               ),
-      //               selected: true,
-      //               onTap: () => Navigator.push(
-      //                     context,
-      //                     MaterialPageRoute(
-      //                       builder: (context) => BottomNavBar(),
-      //                     ),
-      //                   )),
-      //           ListTile(
-      //               leading: Icon(
-      //                 CupertinoIcons.bell_fill,
-      //                 color: Colors.black,
-      //               ),
-      //               title: Text(
-      //                 "Notifications",
-      //                 style: kNavigationText,
-      //               ),
-      //               selected: true,
-      //               onTap: () => Navigator.push(
-      //                     context,
-      //                     MaterialPageRoute(
-      //                       builder: (context) => BottomNavBar(),
-      //                     ),
-      //                   )),
-      //           ListTile(
-      //               leading: Icon(
-      //                 CupertinoIcons.star_fill,
-      //                 color: Colors.black,
-      //               ),
-      //               title: Text(
-      //                 "Rate Us",
-      //                 style: kNavigationText,
-      //               ),
-      //               selected: true,
-      //               onTap: () => Navigator.push(
-      //                     context,
-      //                     MaterialPageRoute(
-      //                       builder: (context) => BottomNavBar(),
-      //                     ),
-      //                   )),
-      //           ListTile(
-      //               leading: Icon(
-      //                 CupertinoIcons.doc_text_fill,
-      //                 color: Colors.black,
-      //               ),
-      //               title: Text(
-      //                 "Ters & Conditions",
-      //                 style: kNavigationText,
-      //               ),
-      //               selected: true,
-      //               onTap: () => Navigator.push(
-      //                     context,
-      //                     MaterialPageRoute(
-      //                       builder: (context) => BottomNavBar(),
-      //                     ),
-      //                   )),
-      //           ListTile(
-      //             leading: Icon(
-      //               CupertinoIcons.headphones,
-      //               color: Colors.black,
-      //             ),
-      //             title: Text("Help & Support", style: kNavigationText),
-      //             selected: true,
-      //             onTap: () => Navigator.push(
-      //               context,
-      //               MaterialPageRoute(
-      //                 builder: (context) => UserProfile(),
-      //               ),
-      //             ),
-      //           ),
-      //           ListTile(
-      //             leading: Icon(
-      //               Icons.settings,
-      //               color: Colors.black,
-      //             ),
-      //             title: Text("Settings", style: kNavigationText),
-      //             selected: true,
-      //             onTap: () => Navigator.of(context).pop(),
-      //           ),
-      //           ListTile(
-      //             leading: Icon(
-      //               CupertinoIcons.lock_fill,
-      //               color: Colors.black,
-      //             ),
-      //             title: Text("Logout", style: kNavigationText),
-      //             selected: true,
-      //             onTap: () => Navigator.push(
-      //               context,
-      //               MaterialPageRoute(
-      //                 builder: (context) => UserProfile(),
-      //               ),
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
     );
+  }
+
+  Widget brands(item) {
+    print("dfdf${item['logo']}");
+    return SizedBox(
+        child: InkWell(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Product(brandname: {
+                            "brandname": null,
+                            "searchby": null,
+                            "id": item['id']
+                          })));
+            },
+            child: Card(
+              elevation: 2,
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                      height: 80,
+                      width: 120,
+                      margin: EdgeInsets.all(6.0),
+                      child: Image.network(
+                          Network().imageget + "/" + item['logo'],
+                          fit: BoxFit.cover)),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          child: Text(
+                            "${item['name']}",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: "OpenSans",
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          child: Text(
+                            "${item['slug']}",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontFamily: "OpenSans",
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          child: Text(
+                            "${item['address']}",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontFamily: "OpenSans",
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            )));
   }
 
   Widget pruductImage() {
@@ -632,8 +532,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Product(
-                                      brandid: brandmodel[index]['id'])));
+                                  builder: (context) => Product(brandname: {
+                                        "brandname": null,
+                                        "searchby": null,
+                                        "id": brandmodel[index]['id']
+                                      })));
                         },
                         child: Card(
                           color: Colors.white,
@@ -652,4 +555,31 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  Widget nearby(BuildContext context) => SizedBox(
+          child: Card(
+        elevation: 2,
+        color: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+                height: 60,
+                width: 60,
+                margin: EdgeInsets.all(6.0),
+                child: Image.network("fdd", fit: BoxFit.fill)),
+            Container(
+              child: Text(
+                "sdfds",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontFamily: "OpenSans",
+                  fontWeight: FontWeight.w600,
+                  color: Colors.red,
+                ),
+              ),
+            )
+          ],
+        ),
+      ));
 }

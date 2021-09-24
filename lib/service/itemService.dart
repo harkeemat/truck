@@ -11,35 +11,42 @@ class ItemServices {
   StorageService storageService = StorageService();
   List<ShopItemModel> shoppingList = [];
 
-  getdata() async {
-    var res;
-    globalisbrand == true
-        ? res = await Network().getData('/getproductbybrand/$globalbranname')
-        : globaliscategory == true
-            ? res = await Network().getData('/getproductBYcat/$globalbranname')
-            : globalisproduct == true
-                ? res =
-                    await Network().getData('/getproductname/$globalbranname')
-                : res = await Network().getData('/getproduct/$globalbrandid');
+// var data =() => {
+//   var res;
+//     globalisbrand == true
+//         ? res = await Network().getData('/getproductbybrand/$globalbranname')
+//         : globaliscategory == true
+//             ? res = await Network().getData('/getproductBYcat/$globalbranname')
+//             : globalisproduct == true
+//                 ? res =
+//                     await Network().getData('/getproductname/$globalbranname')
+//                 : res = await Network().getData('/getproduct/$globalbrandid');
 
-    //var res = await Network().getData('/getproduct/$globalbrandid');
+//     //var res = await Network().getData('/getproduct/$globalbrandid');
 
-    final jsonresponse = json.decode(res.body);
-    //print(jsonresponse['data']);
+//     final jsonresponse = json.decode(res.body);
 
-    return jsonresponse['data'];
+//     return jsonresponse['data'];
+// }
+  futurereturn() async {
+    //int count = 1;
+    //print(data);
+    return await getdata();
+    //print("data $data");
   }
 
   List<ShopItemModel> getShoppingItems() {
-    var data = getdata();
-    //print("data$data");
     int count = 1;
-    //print(data);
+     var data = futurereturn();
     data.forEach((element) {
+      print("data3 $element");
       element['id'] = count;
       shoppingList.add(ShopItemModel.fromJson(element));
       count++;
     });
+    // print("data3 $shoppingList");
+    //return shoppingList;
+    //futurereturn();
     return shoppingList;
   }
 
@@ -50,6 +57,7 @@ class ItemServices {
   }
 
   loadItems() async {
+    await storageService.deleteItem("isFirstTime");
     bool isFirst = await isFirstTime();
 
     if (isFirst) {
@@ -68,6 +76,7 @@ class ItemServices {
   }
 
   Future saveToLocalDB() async {
+    //print(this.items);
     List<ShopItemModel> items = this.items;
     for (var i = 0; i < items.length; i++) {
       await sqlService.saveRecord(items[i]);

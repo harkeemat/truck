@@ -1,16 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:truck/model/cartmodel.dart';
+import 'package:truck/network_utils/api.dart';
+import 'package:truck/screen/product/product_detail.dart';
 
-import 'package:truck/shop/screens/cart/cart_model.dart';
 import 'package:truck/shop/screens/payment/payment_detail.dart';
 import 'package:truck/shop/utlis/platte.dart';
-import 'package:truck/shop/widgets/bottom_bar.dart';
+
 
 class Cart extends StatefulWidget {
   const Cart({Key key}) : super(key: key);
 
   @override
-  _CartState createState() => _CartState();
+  State<StatefulWidget> createState() {
+    return _CartState();
+  }
 }
 
 class _CartState extends State<Cart> {
@@ -27,29 +32,39 @@ class _CartState extends State<Cart> {
           "My Cart",
           style: kBodyNrmlRedText,
         ),
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            iconSize: 18.0,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => BottomNavBar()),
-              );
-            }),
+        // leading: IconButton(
+        //     icon: Icon(Icons.arrow_back_ios),
+        //     iconSize: 18.0,
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(builder: (context) => BottomNavBar()),
+        //       );
+        //     }),
         elevation: 2,
       ),
       body: ListView(
         children: [
           Container(
-            child: (CartModel.products.isNotEmpty)
-                ? ListView.builder(
+            child: ScopedModel.of<CartModel>(context, rebuildOnChange: true)
+                        .cart
+                        .length ==
+                    0
+                ? Text("No items in Cart")
+                : ListView.builder(
                     primary: false,
                     shrinkWrap: true,
                     // physics: ClampingScrollPhysics(),
-                    itemCount: CartModel.products.length,
-                    itemBuilder: (BuildContext context, int index) =>
-                        CartData(item: CartModel.products[index]))
-                : CircularProgressIndicator(),
+                    itemCount: ScopedModel.of<CartModel>(context,
+                            rebuildOnChange: true)
+                        .total,
+                    itemBuilder: (context, index) {
+                      return ScopedModelDescendant<CartModel>(
+                          builder: (context, child, model) {
+                        //print(model.cart[index]);
+                        return CartData(item: model.cart[index]);
+                      });
+                    }),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -98,7 +113,12 @@ class _CartState extends State<Cart> {
                       ),
                       Container(
                         child: Text(
-                          "\$68",
+                          "\$ " +
+                              ScopedModel.of<CartModel>(context,
+                                      rebuildOnChange: true)
+                                  .totalCartValue
+                                  .toString() +
+                              "",
                           style: ksmallBlackText,
                         ),
                       ),
@@ -118,7 +138,12 @@ class _CartState extends State<Cart> {
                       ),
                       Container(
                         child: Text(
-                          "+$_price",
+                          "\$ " +
+                              ScopedModel.of<CartModel>(context,
+                                      rebuildOnChange: true)
+                                  .totalCartValue
+                                  .toString() +
+                              "",
                           style: ksmallBlackText,
                         ),
                       ),
@@ -141,7 +166,12 @@ class _CartState extends State<Cart> {
                       ),
                       Container(
                         child: Text(
-                          "$_totalPrice",
+                          "\$ " +
+                              ScopedModel.of<CartModel>(context,
+                                      rebuildOnChange: true)
+                                  .totalCartValue
+                                  .toString() +
+                              "",
                           style: ksmallBlackText,
                         ),
                       ),
@@ -166,7 +196,11 @@ class _CartState extends State<Cart> {
                       40), // double.infinity is the width and 30 is the height
                 ),
                 child: Text(
-                  "MAKE ORDER ($_totalPrice)",
+                  "MAKE ORDER (" +
+                      ScopedModel.of<CartModel>(context, rebuildOnChange: true)
+                          .totalCartValue
+                          .toString() +
+                      ")",
                   style: ksmallText,
                 ),
                 onPressed: () {
@@ -184,13 +218,21 @@ class _CartState extends State<Cart> {
   }
 }
 
-class CartData extends StatelessWidget {
-  final CartItem item;
+class CartData extends StatefulWidget {
+  final item;
 
   const CartData({Key key, @required this.item}) : super(key: key);
 
   @override
+  _CartDataState createState() => _CartDataState(item: this.item);
+}
+
+class _CartDataState extends State<CartData> {
+  final item;
+  _CartDataState({this.item});
+  @override
   Widget build(BuildContext context) {
+    print(widget.item);
     return Card(
         elevation: 1,
         color: Colors.white,
@@ -198,11 +240,22 @@ class CartData extends StatelessWidget {
           padding: const EdgeInsets.all(4.0),
           child: Row(
             children: [
+              InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ItemDetailPage(itemId: item.id)));
+                  },
+                  child:
               Container(
                   height: 80,
                   width: 100,
                   margin: EdgeInsets.all(6.0),
-                  child: Image.network(item.image, fit: BoxFit.cover)),
+                  child: Image.network(
+                          Network().imageget + "/" + widget.item.image,
+                          fit: BoxFit.cover))),
               Container(
                 child: Column(
                   children: [
@@ -211,52 +264,69 @@ class CartData extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ItemDetailPage(itemId: item.id)));
+                              },
+                              child:
                           Container(
                             child: Text(
-                              item.name,
+                              widget.item.name,
                               style: kBodyNrmlRedText,
                             ),
-                          ),
+                          )),
                           Container(
-                            child: Text(
-                              "Desert sweet icecream",
-                              style: kNavigationText,
-                            ),
-                          ),
+                              child: Text(
+                            widget.item.qty.toString() +
+                                " x " +
+                                widget.item.price.toString() +
+                                " = " +
+                                (widget.item.qty *
+                                        double.parse(widget.item.price))
+                                    .toString(),
+                            style: kNavigationText,
+                          )),
                           Container(
                             child: Card(
-                              color: Colors.white,
-                              elevation: 2,
-                              child: Row(
-                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                                children: [
-                                  Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(6, 2.0, 6.0, 2.0),
-                                      child: Icon(
-                                        CupertinoIcons.add,
-                                        color: Colors.red[800],
-                                        size: 14,
-                                      )),
-                                  Padding(
-                                      padding: EdgeInsets.fromLTRB(
-                                          10, 2.0, 6.0, 2.0),
-                                      child: Text(
-                                        "1",
-                                        style: kBodyNrmlRedText,
-                                      )),
-                                  Padding(
-                                      padding: EdgeInsets.fromLTRB(
-                                          10, 2.0, 6.0, 2.0),
-                                      child: Icon(
-                                        CupertinoIcons.minus,
-                                        color: Colors.red[800],
-                                        size: 14,
-                                      )),
-                                ],
-                              ),
-                            ),
+                                color: Colors.white,
+                                elevation: 2,
+                                child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(
+                                          CupertinoIcons.add,
+                                          color: Colors.red[800],
+                                          size: 14,
+                                        ),
+                                        onPressed: () {
+                                          ScopedModel.of<CartModel>(context,
+                                                  rebuildOnChange: true)
+                                              .updateProduct(widget.item,
+                                                  widget.item.qty + 1);
+                                          // model.removeProduct(model.cart[index]);
+                                        },
+                                      ),
+                                      Text("1"),
+                                      IconButton(
+                                        icon: Icon(
+                                          CupertinoIcons.minus,
+                                          color: Colors.red[800],
+                                          size: 14,
+                                        ),
+                                        onPressed: () {
+                                          ScopedModel.of<CartModel>(context,
+                                                  rebuildOnChange: true)
+                                              .updateProduct(widget.item,
+                                                  widget.item.qty - 1);
+                                          // model.removeProduct(model.cart[index]);
+                                        },
+                                      ),
+                                    ])),
                           )
                         ],
                       ),

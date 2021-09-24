@@ -9,8 +9,8 @@ class SQLService {
     try {
       // Get a location using getDatabasesPath
       var databasesPath = await getDatabasesPath();
-      String path = join(databasesPath, 'shopping.db');
-      //await deleteDatabase(path);
+      String path = join(databasesPath, 'shop.db');
+      await deleteDatabase(path);
       //print(path);
       // opeprintn the database
       db = await openDatabase(
@@ -32,7 +32,7 @@ class SQLService {
 
   createTables() async {
     try {
-      var qry = "CREATE TABLE IF NOT EXISTS shopping ( "
+      var qry = "CREATE TABLE shopp ( "
           "id INTEGER PRIMARY KEY,"
           "quntity INTEGER,"
           "brand_id INTEGER,"
@@ -48,7 +48,7 @@ class SQLService {
           "weight REAL,"
           "datetime DATETIME)";
       await db?.execute(qry);
-      qry = "CREATE TABLE IF NOT EXISTS cart_list ( "
+      qry = "CREATE TABLE  cart_list ( "
           "id INTEGER PRIMARY KEY,"
           "shop_id INTEGER,"
           "quntity INTEGER,"
@@ -59,6 +59,7 @@ class SQLService {
           "price REAL,"
           "fav INTEGER,"
           "rating REAL,"
+          "sale_price REAL,"
           "datetime DATETIME)";
 
       await db?.execute(qry);
@@ -71,20 +72,20 @@ class SQLService {
   Future saveRecord(ShopItemModel data) async {
     await this.db?.transaction((txn) async {
       var qry =
-          'INSERT INTO shopping(name, price, image,rating,fav,quntity,brand_id,sku,sale_price,description,category_id) VALUES("${data.name}",${data.price}, "${data.image}",${data.rating},${data.fav ? 1 : 0},${data.quntity},${data.brandid},${data.sku},${data.saleprice},${data.description},${data.categoryid})';
+          'INSERT INTO shopp(name,price,image,rating,fav,quntity,brand_id,category_id,sale_price,sku,description) VALUES("${data.name}",${data.price}, "${data.image}",${data.rating},${data.fav ? 1 : 0},${data.quntity},${data.brandid},${data.categoryid},${data.saleprice},"${data.sku}","${data.description}")';
       int id1 = await txn.rawInsert(qry);
       return id1;
     });
   }
 
   Future setItemAsFavourite(int id, bool flag) async {
-    var query = "UPDATE shopping set fav = ? WHERE id = ?";
+    var query = "UPDATE shopp set fav = ? WHERE id = ?";
     return await this.db?.rawUpdate(query, [flag ? 1 : 0, id]);
   }
 
   Future getItemsRecord() async {
     try {
-      var list = await db?.rawQuery('SELECT * FROM shopping', []);
+      var list = await db?.rawQuery('SELECT * FROM shopp', []);
       return list ?? [];
     } catch (e) {
       return Future.error(e);
@@ -103,19 +104,19 @@ class SQLService {
   Future addToCart(ShopItemModel data) async {
     await this.db?.transaction((txn) async {
       var qry =
-          'INSERT INTO cart_list(shop_id, name, price, image,rating,fav,quntity) VALUES(${data.id}, "${data.name}",${data.price}, "${data.image}",${data.rating},${data.fav ? 1 : 0},${data.quntity})';
+          'INSERT INTO cart_list(shop_id,name,price,image,rating,fav,quntity) VALUES(${data.id}, "${data.name}",${data.price}, "${data.image}",${data.rating},${data.fav ? 1 : 0},${data.quntity})';
       int id1 = await txn.rawInsert(qry);
       return id1;
     });
   }
 
   Future addToQuntity(int shopId, int value) async {
-    var query = "UPDATE shopping set quntity = ? WHERE id = ?";
+    var query = "UPDATE shopp set quntity = ? WHERE id = ?";
     return await this.db?.rawUpdate(query, [value, shopId]);
   }
 
   Future removeFromCart(int shopId) async {
-    var qry = "DELETE FROM cart_list where shop_id = ${shopId}";
+    var qry = "DELETE FROM cart_list where shop_id = $shopId";
     return await this.db?.rawDelete(qry);
   }
 }

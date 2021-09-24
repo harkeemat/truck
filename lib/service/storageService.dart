@@ -9,6 +9,7 @@ class StorageService {
   Future getItem(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String value = prefs.getString(key);
+    
     return value;
   }
 

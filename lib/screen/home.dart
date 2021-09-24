@@ -3,11 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:truck/model/cartmodel.dart';
 import 'package:truck/screen/login.dart';
 import 'package:truck/network_utils/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:truck/screen/my-globals.dart';
 import 'package:truck/screen/nav-drawer.dart';
+import 'package:truck/shop/screens/cart/cart_page.dart';
 import 'package:truck/shop/screens/home/home.dart';
 
 class Home extends StatefulWidget {
@@ -185,10 +188,40 @@ class _HomeState extends State<Home> {
                         });
                       },
                     )
-              : Center(),
+              : Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: InkResponse(
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Cart()));
+                      },
+                      child: Stack(
+                        children: [
+                          Align(
+                            child: Text(ScopedModel.of<CartModel>(context,
+                                            rebuildOnChange: true)
+                                        .cart
+                                        .length >
+                                    0
+                                ? ScopedModel.of<CartModel>(context,
+                                        rebuildOnChange: true)
+                                    .cart
+                                    .length
+                                    .toString()
+                                : ''),
+                            alignment: Alignment.topLeft,
+                          ),
+                          Align(
+                            child: Icon(Icons.shopping_cart),
+                            alignment: Alignment.center,
+                          ),
+                        ],
+                      )),
+                ),
         ],
         title: Text('Dashboard'),
         backgroundColor: globalColor,
+        
       ),
       body: globalRole == "client"
           ? HomeScreen()

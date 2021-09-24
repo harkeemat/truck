@@ -5,6 +5,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:truck/model/cartmodel.dart';
+
 import 'package:truck/model/loaction_model.dart';
 import 'package:truck/notification/pushNotification.dart';
 import 'package:truck/screen/login.dart';
@@ -22,14 +25,18 @@ import 'package:truck/service/location_service.dart';
 
 import 'package:provider/provider.dart';
 
+
+
+
 //void main() => runApp(MyApp());
 //when app is terminate then work
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
-  //print('Handling a background message ${message.messageId}');
+  print('Handling a background message ${message.messageId}');
   globallist = [...globallist, message];
+  
 
 }
 
@@ -80,14 +87,20 @@ void main() async {
   // child: MyApp(),
   // ));
 
-  runApp(MyApp());
+  runApp(MyApp(
+    model: CartModel(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
+   final CartModel model;
+  const MyApp({Key key, @required this.model}) : super(key: key);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ScopedModel<CartModel>(
+        model: model,
+        child: MaterialApp(
         title: 'Truck App',
         debugShowCheckedModeBanner: false,
         home: CheckAuth(),
@@ -95,16 +108,18 @@ class MyApp extends StatelessWidget {
           '/message': (context) => MessageView(),
           "/ridebook": (BuildContext context) => new RideBook(),
           
-        });
+        }));
   }
 }
 
 class CheckAuth extends StatefulWidget {
+ 
   @override
   _CheckAuthState createState() => _CheckAuthState();
 }
 
 class _CheckAuthState extends State<CheckAuth> {
+  
   FirebaseNotifcation firebase;
   //final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
@@ -140,8 +155,8 @@ class _CheckAuthState extends State<CheckAuth> {
       if (message != null) {
         Navigator.pushNamed(context, '/message',
             arguments: MessageArguments(message, true));
-        // Navigator.pushNamed(context, "/" + message.data['screen'],
-        // arguments: MessageArguments(message, true));
+         Navigator.pushNamed(context, "/" + message.data['screen'],
+            arguments: MessageArguments(message, true));
       }
     });
 
@@ -172,7 +187,7 @@ class _CheckAuthState extends State<CheckAuth> {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       //print('A new onMessageOpenedApp event was published! $message');
 
-      Navigator.pushNamed(context, '/message',
+       Navigator.pushNamed(context, "/" + message.data['screen'],
           arguments: MessageArguments(message, true));
     });
     firebase = FirebaseNotifcation();

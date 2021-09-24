@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:truck/model/cartmodel.dart';
+import 'package:truck/screen/home.dart';
 
 import 'package:truck/shop/screens/foodOrder/track_order.dart';
 import 'package:truck/shop/utlis/platte.dart';
-import 'package:truck/shop/widgets/bottom_bar.dart';
+
 
 class OrderConfirm extends StatefulWidget {
   OrderConfirm({Key key}) : super(key: key);
@@ -29,15 +32,15 @@ class _OrderConfirmState extends State<OrderConfirm> {
           "Order Confirmation",
           style: kBodyNrmlRedText,
         ),
-        leading: IconButton(
-            iconSize: 18.0,
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => BottomNavBar()),
-              );
-            }),
+        // leading: IconButton(
+        //     iconSize: 18.0,
+        //     icon: Icon(Icons.arrow_back_ios),
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(builder: (context) => BottomNavBar()),
+        //       );
+        //     }),
         elevation: 2,
       ),
       body: Padding(
@@ -63,7 +66,7 @@ class _OrderConfirmState extends State<OrderConfirm> {
               ),
               Center(
                 child: Container(
-                  child: Text("Hey Gaurav", style: ksmallBoldBlackText),
+                  child: Text("Hey ", style: ksmallBoldBlackText),
                 ),
               ),
               Center(
@@ -147,7 +150,12 @@ class _OrderConfirmState extends State<OrderConfirm> {
                           ),
                           Container(
                             child: Text(
-                              "$_totalPrice",
+                              "\$ " +
+                                  ScopedModel.of<CartModel>(context,
+                                          rebuildOnChange: true)
+                                      .totalCartValue
+                                      .toString() +
+                                  "",
                               style: ksmallBlackText,
                             ),
                           ),
@@ -193,7 +201,7 @@ class _OrderConfirmState extends State<OrderConfirm> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => BottomNavBar()),
+                                builder: (context) => Home()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

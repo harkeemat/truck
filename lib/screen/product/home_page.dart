@@ -16,7 +16,7 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.proid}) : super(key: key);
 
   final proid;
-
+  bool isclick = false;
   @override
   _MyHomePageState createState() => _MyHomePageState(proid: this.proid);
 }

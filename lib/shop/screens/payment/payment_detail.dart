@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:truck/model/cartmodel.dart';
 
 import 'package:truck/shop/screens/foodOrder/order_confirm_detail.dart';
 import 'package:truck/shop/utlis/platte.dart';
-import 'package:truck/shop/widgets/bottom_bar.dart';
+
 
 class PaymentDetail extends StatefulWidget {
   PaymentDetail({Key key}) : super(key: key);
@@ -29,15 +31,15 @@ class _PaymentDetailState extends State<PaymentDetail> {
           "Payment",
           style: kBodyNrmlRedText,
         ),
-        leading: IconButton(
-            iconSize: 18.0,
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => BottomNavBar()),
-              );
-            }),
+        // leading: IconButton(
+        //     iconSize: 18.0,
+        //     icon: Icon(Icons.arrow_back_ios),
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(builder: (context) => BottomNavBar()),
+        //       );
+        //     }),
         elevation: 2,
       ),
       body: ListView(
@@ -316,7 +318,12 @@ class _PaymentDetailState extends State<PaymentDetail> {
                       ),
                       Container(
                         child: Text(
-                          "$_totalPrice",
+                          "\$ " +
+                              ScopedModel.of<CartModel>(context,
+                                      rebuildOnChange: true)
+                                  .totalCartValue
+                                  .toString() +
+                              "",
                           style: ksmallBlackText,
                         ),
                       ),
@@ -341,7 +348,11 @@ class _PaymentDetailState extends State<PaymentDetail> {
                       40), // double.infinity is the width and 30 is the height
                 ),
                 child: Text(
-                  "MAKE ORDER ($_totalPrice)",
+                  "MAKE ORDER (\$ " +
+                      ScopedModel.of<CartModel>(context, rebuildOnChange: true)
+                          .totalCartValue
+                          .toString() +
+                      ")",
                   style: ksmallText,
                 ),
                 onPressed: () {
