@@ -4,6 +4,7 @@ import 'package:scoped_model/scoped_model.dart';
 class CartModel extends Model {
   List<Product> cart = [];
   double totalCartValue = 0;
+  double totalCartValueget = 0;
   double saletotalCartValue = 0;
 
   int get total => cart.length;
@@ -47,14 +48,18 @@ class CartModel extends Model {
   }
 
   void calculateTotal() {
-    totalCartValue = 0;
+    totalCartValueget = 0;
     cart.forEach((f) {
-      totalCartValue += double.parse(f.price) * f.qty;
+      totalCartValueget += double.parse(f.price) * f.qty;
     });
+    totalCartValue = getNumber(totalCartValueget, precision: 1);
     // cart.forEach((f) {
     //   saletotalCartValue += double.parse(f.saleprice) * f.qty;
     // });
   }
+
+  double getNumber(double input, {int precision = 2}) => double.parse(
+      '$input'.substring(0, '$input'.indexOf('.') + precision + 1));
 
   // void calculatesaleTotal() {
   //   saletotalCartValue = 0;

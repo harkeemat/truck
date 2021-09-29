@@ -3,13 +3,14 @@ import 'package:get/get.dart';
 import 'package:truck/controller/homePageController.dart';
 
 import 'package:truck/model/cartmodel.dart';
+import 'package:truck/screen/cart/cart_page.dart';
 import 'package:truck/screen/my-globals.dart';
 import 'package:truck/screen/product/product_detail.dart';
 import 'package:truck/screen/product/seeproduct.dart';
-import 'package:truck/screen/product/cart.dart';
+import 'package:truck/screen/product/checkout.dart';
 
 import 'package:scoped_model/scoped_model.dart';
-import 'package:truck/shop/screens/cart/cart_page.dart';
+
 
 class Product extends StatefulWidget {
   Product({Key key, this.brandname}) : super(key: key);

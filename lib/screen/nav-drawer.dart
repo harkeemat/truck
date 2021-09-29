@@ -2,26 +2,19 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:truck/model/jobPost.dart';
+
 import 'package:truck/network_utils/api.dart';
-import 'package:truck/screen/feedback.dart';
-import 'package:truck/screen/getdetail.dart';
+
 import 'package:truck/screen/home.dart';
 import 'package:truck/screen/jobpost.dart';
 import 'package:truck/screen/logout.dart';
-import 'package:truck/screen/map_screen.dart';
-import 'package:truck/screen/my-globals.dart';
+import 'package:truck/screen/manage_addresses/manage_addresses_screen.dart';
+
 import 'package:truck/screen/payment.dart';
-import 'package:truck/screen/product/mainPage.dart';
-import 'package:truck/screen/product/product_detail.dart';
+
 import 'package:truck/screen/profile.dart';
 import 'package:truck/screen/rideBook.dart';
-import 'package:truck/screen/setting.dart';
-import 'package:truck/screen/startride.dart';
-import 'package:truck/screen/test.dart';
-import 'package:truck/screen/viewpost.dart';
-import 'package:truck/shop/screens/home/home.dart';
-import 'package:truck/shop/screens/user/login_page.dart';
+
 
 class NavDrawer extends StatefulWidget {
   @override
@@ -117,7 +110,9 @@ class _NavDrawerState extends State<NavDrawer> {
             title: Text('Settings'),
             onTap: () => {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Payment()))
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ManageAddressesScreen()))
             },
           ),
           //  ListTile(

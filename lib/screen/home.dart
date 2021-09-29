@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:truck/model/cartmodel.dart';
+import 'package:truck/screen/cart/cart_page.dart';
 import 'package:truck/screen/login.dart';
 import 'package:truck/network_utils/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:truck/screen/my-globals.dart';
 import 'package:truck/screen/nav-drawer.dart';
-import 'package:truck/shop/screens/cart/cart_page.dart';
-import 'package:truck/shop/screens/home/home.dart';
+import 'package:truck/screen/product/home/home.dart';
+
 
 class Home extends StatefulWidget {
   @override
@@ -104,7 +105,7 @@ class _HomeState extends State<Home> {
     String token = await FirebaseMessaging.instance.getToken();
     DocumentSnapshot documentSnapshot;
     try {
-      documentSnapshot = await firestore.collection('users').doc(name).get();
+      documentSnapshot = await firestore.collection('driver').doc(name).get();
       //print();
       if (documentSnapshot.data() != null) {
         print(documentSnapshot.id + "id");
@@ -132,7 +133,7 @@ class _HomeState extends State<Home> {
 
   void _update() async {
     try {
-      firestore.collection('users').doc('testUser').update({
+      firestore.collection('driver').doc('testUser').update({
         'firstName': 'Alan',
       });
     } catch (e) {
@@ -145,7 +146,7 @@ class _HomeState extends State<Home> {
     var user = jsonDecode(localStorage.getString('user'));
     String name = (user['id']).toString();
     try {
-      firestore.collection('users').doc(name).delete();
+      firestore.collection('driver').doc(name).delete();
       //print(name);
       print(isAuth);
     } catch (e) {

@@ -138,7 +138,7 @@ class _RideBookState extends State<RideBook> {
     var token;
     String fcmToken = await _fcm.getToken();
     await FirebaseFirestore.instance
-        .collection('users')
+        .collection('driver')
         .doc(userId.toString())
         .collection('tokens')
         .get()
@@ -160,7 +160,7 @@ class _RideBookState extends State<RideBook> {
   String price;
   Future<String> getData() async {
     //return await FirebaseFirestore.instance.collection('DriversList').getDocuments();
-    firestore.collection("users").get().then((querySnapshot) {
+    firestore.collection("driver").get().then((querySnapshot) {
       //print(querySnapshot.docs);
       querySnapshot.docs.forEach((result) {
         //Map<String, dynamic> user = result.data();
@@ -925,19 +925,7 @@ class _RideBookState extends State<RideBook> {
                               getvehicledata[index]['image']),
                           height: 200,
                         ),
-                        // CircleAvatar(
-                        // backgroundImage: NetworkImage(
-                        // Network().imageget +
-                        // "/" +
-                        // alertdata[index]['image']),
-                        // radius: 100,
-                        // child: ClipOval(
-                        // child: Image(
-                        // image: NetworkImage(Network().imageget +
-                        // "/" +
-                        // alertdata[index]['image'])),
-                        // ),
-                        // ),
+                        
                       ),
                     );
                   }),

@@ -14,6 +14,7 @@ String globalsearchword = "";
 String globalString = "";
 String globalRole = "";
 double globalDouble = 10.0;
+String globaladdresid = '';
 List<RemoteMessage> globallist = [];
 
 Color globalColor = _colorFromHex("30B7A9");

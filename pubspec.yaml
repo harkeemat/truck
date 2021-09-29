@@ -74,7 +74,11 @@ dependencies:
   get: ^4.3.8
   scoped_model: ^1.1.0
   rflutter_alert: ^2.0.4
-
+  logger: ^1.1.0
+  flutter_svg: ^0.22.0
+  string_validator: ^0.3.0
+  enum_to_string: ^2.0.1
+  grouped_buttons: ^1.0.4
   
 
   
@@ -135,13 +139,13 @@ flutter:
   fonts:
   - family: OpenSans
     fonts:
-      - asset:  fonts/OpenSans-Regular.ttf
-      - asset:  fonts/OpenSans-Bold.ttf
-      - weight: 700
+        - asset: fonts/OpenSans-Regular.ttf
+        - asset: fonts/OpenSans-Bold.ttf
+        - weight: 700
   - family: Roboto
     fonts:
-      - asset:  fonts/Roboto-Regular.ttf
-      - asset:  fonts/Roboto-Bold.ttf
-      - weight: 700
+        - asset: fonts/Roboto-Regular.ttf
+        - asset: fonts/Roboto-Bold.ttf
+        - weight: 700
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

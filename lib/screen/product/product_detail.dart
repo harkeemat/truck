@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:truck/model/cartmodel.dart';
 import 'package:truck/network_utils/api.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:truck/screen/product/cart.dart';
+import 'package:truck/screen/cart/cart_page.dart';
+
 import 'package:scoped_model/scoped_model.dart';
+
 
 class ItemDetailPage extends StatefulWidget {
   final int itemId;
@@ -392,7 +394,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           ),
           onPressed: () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => CartPage()));
+                context, MaterialPageRoute(builder: (context) => Cart()));
             Navigator.of(context, rootNavigator: true).pop();
           },
           gradient: LinearGradient(colors: [
