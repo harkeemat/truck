@@ -25,6 +25,8 @@ import 'package:truck/service/location_service.dart';
 
 import 'package:provider/provider.dart';
 
+import 'notification/message_list.dart';
+
 
 
 
@@ -106,6 +108,7 @@ class MyApp extends StatelessWidget {
         home: CheckAuth(),
         routes: <String, WidgetBuilder>{
           '/message': (context) => MessageView(),
+          '/messagelist': (context) => MessageList(),
           "/ridebook": (BuildContext context) => new RideBook(),
           
         }));

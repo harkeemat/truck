@@ -108,7 +108,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                           height: 24,
                         ),
                         Text(
-                          "\$ ${_products[0].saleprice}",
+                          "\$ ${_products[0].price}",
                           style: TextStyle(
                               color: Colors.black54,
                               fontSize: 18,
@@ -118,7 +118,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                           width: 6,
                         ),
                         Text(
-                          "\$ ${_products[0].price}",
+                          "\$ ${_products[0].saleprice}",
                           style: TextStyle(
                               color: Colors.red,
                               fontSize: 20,

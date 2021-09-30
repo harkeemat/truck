@@ -240,7 +240,7 @@ class _BodyState extends State<Body> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final address = snapshot.data;
-                  // index == 0 ? globaladdresid = addressId : addressId;
+                   index == 0 ? globaladdresid = addressId : '';
                   return Row(
                     children: [
                       Expanded(

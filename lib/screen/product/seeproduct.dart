@@ -54,6 +54,7 @@ class _AllproductState extends State<Allproduct> {
           qty: data['quantity'],
           weight: data['image'],
           rating: data['rating'],
+          saleprice: data['sale_price'],
         );
       }).toList();
       //print(test[0].name);

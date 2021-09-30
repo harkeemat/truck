@@ -5,8 +5,12 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:truck/network_utils/api.dart';
+import 'package:truck/screen/home.dart';
 import 'package:truck/screen/my-globals.dart';
+import 'package:truck/screen/nav-drawer.dart';
 import 'package:truck/screen/test.dart';
 
 // import 'package:truck/screen/test.dart';
@@ -64,220 +68,247 @@ class _MessageList extends State<MessageList> {
 
   @override
   Widget build(BuildContext context) {
-    
     if (_messages.isEmpty) {
       return const Text('No messages received');
     }
 
-    return ListView.builder(
-        shrinkWrap: true,
-        itemCount: _messages.length != null ? _messages.length : 0,
-        // ignore: missing_return
-        itemBuilder: (context, index) {
-          RemoteMessage message = _messages[index];
+    return Scaffold(
+      drawer: NavDrawer(),
+      appBar: AppBar(
+        backgroundColor: globalColor,
+        title: Text("Booking"),
+      ),
+      body: ListView.builder(
+          shrinkWrap: true,
+          itemCount: _messages.length != null ? _messages.length : 0,
+          // ignore: missing_return
+          itemBuilder: (context, index) {
+            RemoteMessage message = _messages[index];
 
-          if (message != null) print("list${message.data}");
-          return Container(
+            if (message != null)
+              return Container(
               padding: EdgeInsets.all(2),
               child: Column(
                 children: [
                   Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  color: globalColor,
-                  elevation: 30,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: Text(
-                                    "Client name=> ${message.data['sender_name']}",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 12))),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                  "Order No # ${message.data['order_number']}",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 15)),
-                            ),
-                          ],
-                        ),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Text(
-                                  "Pick Up Loaction=> ${message.data['current']}",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 15)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                  "Drop Location=> ${message.data['drop']}",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Text(
-                                  "Pick Up Date=> ${message.data['date']}",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Text(
-                                  "Drop Date=> ${message.data['dropdate']}",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Text(
-                                  "Luggage Type=> ${message.data['luggage']}",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Text(
-                                  "Deminishons=> ${message.data['deminishons']}",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Text(
-                                  "Total Distance=> ${message.data['Distance']}",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Text("Price=> ${message.data['price']}",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Text("Weight=> ${message.data['Weight']}",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(2),
-                        child: TextField(
-                          controller: _priceController,
-                          decoration: InputDecoration(
-                            hintText: 'Price',
-                          ),
-                          // onSubmitted: (value) {
-                          // getData();
-                          // },
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(2),
-                        child: TextField(
-                          controller: _discriptionController,
-                          decoration: InputDecoration(
-                            hintText: 'Discription',
-                          ),
-                          // onSubmitted: (value) {
-                          // getData();
-                          // },
-                        ),
-                      ),
-                      Center(
-                        child: Container(
-                          child: Padding(
+                      color: globalColor,
+                      elevation: 30,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                  FlatButton(
-                                    onPressed: () {}, child: Text("Cancel")),
-                                FlatButton(
-                                    onPressed: () {
-                                      _response(message.data);
-                                    },
-                                    child: Text("Aprrove")),
+                                Padding(
+                                    padding: const EdgeInsets.all(6.0),
+                                    child: Text(
+                                        "Client name=> ${message.data['sender_name']}",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12))),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                      "Order No # ${message.data['order_number']}",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 15)),
+                                ),
                               ],
                             ),
                           ),
-                        ),
-                      ),
-                      // SizedBox(
-                      // height: 600.0,
-                      // child: Padding(
-                      // padding: EdgeInsets.all(0),
-                      // child: Test(currentdata: {
-                      // "currentLocation": message.data['current'],
-                      // "destinationLocation": message.data['drop']
-                      // }),
-                      // ),
-                      // ),
-                    ],
+                          Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: Text(
+                                      "Pick Up Loaction=> ${message.data['current']}",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 15)),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                      "Drop Location=> ${message.data['drop']}",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        // Padding(
+                          //   padding: const EdgeInsets.all(6.0),
+                          //   child: Row(
+                          //     children: [
+                          //       Padding(
+                          //         padding: const EdgeInsets.all(6.0),
+                          //         child: Text(
+                          //             "Pick Up Date=> ${message.data['date']}",
+                          //             style: TextStyle(
+                          //                 color: Colors.white, fontSize: 12)),
+                          //       ),
+                          //       Padding(
+                          //         padding: const EdgeInsets.all(6.0),
+                          //         child: Text(
+                          //             "Drop Date=> ${message.data['dropdate']}",
+                          //             style: TextStyle(
+                          //                 color: Colors.white, fontSize: 12)),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          // Padding(
+                          //   padding: const EdgeInsets.all(6.0),
+                          //   child: Row(
+                          //     children: [
+                          //       Padding(
+                          //         padding: const EdgeInsets.all(6.0),
+                          //         child: Text(
+                          //             "Luggage Type=> ${message.data['luggage']}",
+                          //             style: TextStyle(
+                          //                 color: Colors.white, fontSize: 12)),
+                          //       ),
+                          //       Padding(
+                          //         padding: const EdgeInsets.all(6.0),
+                          //         child: Text(
+                          //             "Deminishons=> ${message.data['deminishons']}",
+                          //             style: TextStyle(
+                          //                 color: Colors.white, fontSize: 12)),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: Text(
+                                      "Total Distance=> ${message.data['Distance']}",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12)),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: Text(
+                                      "Price=> ${message.data['price']}",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12)),
+                                ),
+                              // Padding(
+                                //   padding: const EdgeInsets.all(6.0),
+                                //   child: Text("Weight=> ${message.data['Weight']}",
+                                //       style: TextStyle(
+                                //           color: Colors.white, fontSize: 12)),
+                                // ),
+                              ],
+                            ),
+                          ),
+                        // Padding(
+                          //   padding: EdgeInsets.all(2),
+                          //   child: TextField(
+                          //     controller: _priceController,
+                          //     decoration: InputDecoration(
+                          //       hintText: 'Price',
+                          //     ),
+                          //     // onSubmitted: (value) {
+                          //     // getData();
+                          //     // },
+                          //   ),
+                          // ),
+                          // Padding(
+                          //   padding: EdgeInsets.all(2),
+                          //   child: TextField(
+                          //     controller: _discriptionController,
+                          //     decoration: InputDecoration(
+                          //       hintText: 'Discription',
+                          //     ),
+                          //     // onSubmitted: (value) {
+                          //     // getData();
+                          //     // },
+                          //   ),
+                          // ),
+                          Center(
+                            child: Container(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                  FlatButton(
+                                      onPressed: () {},
+                                        child: Text("Cancel")),
+                                    FlatButton(
+                                        onPressed: () {
+                                          _response(message.data);
+                                        },
+                                        child: Text("Aprrove")),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          // SizedBox(
+                          // height: 600.0,
+                          // child: Padding(
+                          // padding: EdgeInsets.all(0),
+                          // child: Test(currentdata: {
+                          // "currentLocation": message.data['current'],
+                          // "destinationLocation": message.data['drop']
+                          // }),
+                          // ),
+                          // ),
+                        ],
                     ),
+                  ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        });
+              );
+          }),
+    );
   }
 
   void _response(user) async {
     //print("fsfdsf$user");
-    String sender_id = (user['sender_id']).toString();
+    //String sender_id = (user['sender_id']).toString();
     //String recever_id = (globalInt).toString();
-
-    await firestore
-        .collection((user['sender_id']).toString())
-        .doc((globalInt).toString())
-        .set({
+    var data = {
       'driver_id': globalInt,
-      'price': _priceController.text,
-      'discription': _discriptionController.text,
       'vehicle_type': user['vehicle_type'],
       'order_number': user['order_number'],
       'mobile_number': user['mobile_number'],
       'name': user['name'],
-    });
+    };
+    var res = await Network().authData(data, '/aproveorder');
+
+    var body = json.decode(res.body);
+    print(body);
+    if (body['data'] == 'sucssess') {
+      Fluttertoast.showToast(msg: body['data']);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+    } else {
+      Fluttertoast.showToast(msg: body['data']);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+    }
+    // await firestore
+    //     .collection((user['sender_id']).toString())
+    //     .doc((globalInt).toString())
+    //     .set({
+    //   'driver_id': globalInt,
+    //   'price': _priceController.text,
+    //   'discription': _discriptionController.text,
+    //   'vehicle_type': user['vehicle_type'],
+    //   'order_number': user['order_number'],
+    //   'mobile_number': user['mobile_number'],
+    //   'name': user['name'],
+    // });
   }
 }
 

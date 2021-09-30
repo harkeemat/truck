@@ -79,6 +79,7 @@ dependencies:
   string_validator: ^0.3.0
   enum_to_string: ^2.0.1
   grouped_buttons: ^1.0.4
+  location_permissions: ^3.0.0
   
 
   
